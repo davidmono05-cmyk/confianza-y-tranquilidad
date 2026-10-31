@@ -184,62 +184,189 @@ small{color:#718398}
 </div>
 
 <script>
-let clients=[],contracts=[],files=[];
-function login(){
-if(user.value==='asesor.demo'&&pass.value==='CTdemo2026!'){
-step1.hidden=true;step2.hidden=false;
-}else error.textContent='Credenciales incorrectas';
-}
-function verify(){
-if(code.value==='482916'){
-document.getElementById('login').style.display='none';
-document.getElementById('app').style.display='block';
-}else error2.textContent='Código incorrecto';
-}
-function logout(){location.reload()}
-function show(id){
-document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-}
-function addClient(){
-let n=nombre.value.trim(),e=Number(edad.value),t=tipo.value,r=representante.value.trim();
-if(!n||!Number.isFinite(e)||e<0||e>110){alert('Completa nombre y edad');return}
-if(t==='Menor de edad'&&(e>=18||!r)){alert('Registra un representante legal ficticio');return}
-if(t==='Adulto'&&e<18){alert('La edad debe ser de 18 años o más');return}
-clients.push({n,e,t});
-clientList.innerHTML=clients.map(c=>`<tr><td>${safe(c.n)}</td><td>${c.t}</td><td>${c.e}</td></tr>`).join('');
-total.textContent=clients.length;
-}
-function safe(s){let d=document.createElement('span');d.textContent=s;return d.innerHTML}
-function addContract(){
-if(!contrato.value.trim()){alert('Escribe un cliente');return}
-contracts.push({n:contrato.value,s:estado.value});
-contractList.innerHTML=contracts.map(c=>`<tr><td>${safe(c.n)}</td><td>${c.s}</td></tr>`).join('');
-totalContratos.textContent=contracts.length;
-}
-function addFile(){
-let f=archivo.files[0];
-if(!f){alert('Selecciona un archivo');return}
-if(f.size>8*1024*1024){alert('Máximo 8 MB');return}
-files.push(f.name);
-fileList.innerHTML=files.map(s=>'<li>'+safe(s)+'</li>').join('');
-totalDocs.textContent=files.length;
-}
-function quote(){
-let c=Number(capital.value);
-if(c<=0){alert('Ingresa un capital válido');return}
-let p=c*0.0005;
-resultado.textContent='Prima mensual hipotética: '+p.toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0});
-}
-function claim(){
-let c=Number(indemnizacion.value),p=Number(porcentaje.value);
-if(c<0||p<0||p>100){alert('Revisa los valores');return}
-claimResult.textContent='Resultado simulado: '+(c*p/100).toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0});
-}
-function tax(){
-let v=Number(valor.value),ex=Math.max(0,v-3250*52374);
-taxResult.textContent='Exceso sobre referencia de 3.250 UVT: '+ex.toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0})+'. No equivale al impuesto a pagar.';
-}
+
+(function () {
+  const el = id => document.getElementById(id);
+  let clients = [];
+  let contracts = [];
+  let files = [];
+
+  window.login = function () {
+    const username = el('user').value.trim();
+    const password = el('pass').value;
+
+    if (username === 'asesor.demo' && password === 'CTdemo2026!') {
+      el('step1').hidden = true;
+      el('step2').hidden = false;
+      el('error').textContent = '';
+    } else {
+      el('error').textContent = 'Credenciales incorrectas.';
+    }
+  };
+
+  window.verify = function () {
+    if (el('code').value === '482916') {
+      el('login').style.display = 'none';
+      el('app').style.display = 'block';
+    } else {
+      el('error2').textContent = 'Código incorrecto.';
+    }
+  };
+
+  window.logout = function () {
+    location.reload();
+  };
+
+  window.show = function (id) {
+    document.querySelectorAll('main section').forEach(section => {
+      section.classList.remove('active');
+    });
+    el(id).classList.add('active');
+  };
+
+  window.addClient = function () {
+    const n = el('nombre').value.trim();
+    const e = Number(el('edad').value);
+    const t = el('tipo').value;
+    const r = el('representante').value.trim();
+
+    if (!n || el('edad').value === '' || e < 0 || e > 110) {
+      alert('Completa el nombre y la edad.');
+      return;
+    }
+
+    if (t === 'Menor de edad' && (e >= 18 || !r)) {
+      alert('Registra un representante ficticio para el menor.');
+      return;
+    }
+
+    if (t === 'Adulto' && e < 18) {
+      alert('La edad debe ser de 18 años o más.');
+      return;
+    }
+
+    clients.push({ n, e, t });
+
+    el('clientList').innerHTML = clients.map(c =>
+      '<tr><td>' + safe(c.n) + '</td><td>' +
+      c.t + '</td><td>' + c.e + '</td></tr>'
+    ).join('');
+
+    el('total').textContent = clients.length;
+    el('nombre').value = '';
+    el('edad').value = '';
+    el('representante').value = '';
+  };
+
+  function safe(value) {
+    const span = document.createElement('span');
+    span.textContent = value;
+    return span.innerHTML;
+  }
+
+  window.addContract = function () {
+    const n = el('contrato').value.trim();
+
+    if (!n) {
+      alert('Escribe el nombre ficticio del cliente.');
+      return;
+    }
+
+    contracts.push({ n, s: el('estado').value });
+
+    el('contractList').innerHTML = contracts.map(c =>
+      '<tr><td>' + safe(c.n) + '</td><td>' +
+      c.s + '</td></tr>'
+    ).join('');
+
+    el('totalContratos').textContent = contracts.length;
+    el('contrato').value = '';
+  };
+
+  window.addFile = function () {
+    const f = el('archivo').files[0];
+
+    if (!f) {
+      alert('Selecciona un archivo.');
+      return;
+    }
+
+    if (f.size > 8 * 1024 * 1024) {
+      alert('El archivo debe pesar menos de 8 MB.');
+      return;
+    }
+
+    files.push(f.name);
+
+    el('fileList').innerHTML = files.map(f =>
+      '<li>' + safe(f) + '</li>'
+    ).join('');
+
+    el('totalDocs').textContent = files.length;
+    el('archivo').value = '';
+  };
+
+  window.quote = function () {
+    const capital = Number(el('capital').value);
+
+    if (!Number.isFinite(capital) || capital <= 0) {
+      alert('Ingresa un capital válido.');
+      return;
+    }
+
+    const premium = capital * 0.0005;
+
+    el('resultado').textContent =
+      'Prima mensual hipotética: ' +
+      premium.toLocaleString('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        maximumFractionDigits: 0
+      });
+  };
+
+  window.claim = function () {
+    const capital = Number(el('indemnizacion').value);
+    const percentage = Number(el('porcentaje').value);
+
+    if (!Number.isFinite(capital) || capital < 0 ||
+        !Number.isFinite(percentage) ||
+        percentage < 0 || percentage > 100) {
+      alert('Revisa los valores ingresados.');
+      return;
+    }
+
+    el('claimResult').textContent =
+      'Resultado simulado: ' +
+      (capital * percentage / 100).toLocaleString('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        maximumFractionDigits: 0
+      });
+  };
+
+  window.tax = function () {
+    const value = Number(el('valor').value);
+
+    if (!Number.isFinite(value) || value < 0) {
+      alert('Ingresa un valor válido.');
+      return;
+    }
+
+    const reference = 3250 * 52374;
+    const excess = Math.max(0, value - reference);
+
+    el('taxResult').textContent =
+      'Exceso sobre referencia ilustrativa de 3.250 UVT: ' +
+      excess.toLocaleString('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        maximumFractionDigits: 0
+      }) +
+      '. No equivale al impuesto a pagar.';
+  };
+
+})();
 </script>
 </body>
 </html>
