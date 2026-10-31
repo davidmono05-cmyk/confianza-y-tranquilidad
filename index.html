@@ -1,1 +1,245 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Confianza y Tranquilidad</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f2f6fa;color:#193653}
+header{background:#0b3566;color:white;padding:20px}
+header h2{margin:0}
+header p{margin:5px 0 0;color:#d5e8fa}
+.login{max-width:400px;margin:65px auto;background:white;padding:28px;border-radius:15px;box-shadow:0 5px 25px #0002}
+input,select{width:100%;padding:11px;margin:7px 0;border:1px solid #cbd8e5;border-radius:7px}
+button{background:#087dc2;color:white;border:0;padding:11px 15px;border-radius:7px;cursor:pointer;margin:4px}
+button:hover{background:#075e96}
+nav{background:#092f61;padding:10px;display:flex;flex-wrap:wrap;gap:4px}
+nav button{background:#174b7d}
+main{padding:22px;max-width:1200px;margin:auto}
+section{display:none}
+section.active{display:block}
+.card{background:white;padding:20px;margin:12px 0;border-radius:12px;box-shadow:0 2px 10px #0001}
+h2,h3{color:#0b3566}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+td,th{padding:10px;border-bottom:1px solid #ddd;text-align:left}
+th{background:#edf4fa}
+small{color:#718398}
+.red{color:#d52e42}
+#app{display:none}
+</style>
+</head>
+<body>
+
+<div id="login" class="login">
+<h2>🛡 Confianza y Tranquilidad</h2>
+<p>Acceso exclusivo para asesores</p>
+<div id="step1">
+<input id="user" placeholder="Usuario">
+<input id="pass" type="password" placeholder="Contraseña">
+<button onclick="login()">Continuar</button>
+<p id="error" class="red"></p>
+</div>
+<div id="step2" hidden>
+<p>Segundo paso de verificación</p>
+<input id="code" placeholder="Código de seis dígitos">
+<button onclick="verify()">Ingresar</button>
+<p id="error2" class="red"></p>
+</div>
+<small>Acceso de demostración. Usuario: asesor.demo<br>Contraseña: CTdemo2026!<br>Código: 482916</small>
+</div>
+
+<div id="app">
+<header>
+<h2>🛡 Confianza y Tranquilidad</h2>
+<p>Plataforma educativa de gestión de seguros</p>
+</header>
+<nav>
+<button onclick="show('inicio')">Panel general</button>
+<button onclick="show('clientes')">Clientes</button>
+<button onclick="show('productos')">Pólizas</button>
+<button onclick="show('contratos')">Contratos</button>
+<button onclick="show('documentos')">Documentos</button>
+<button onclick="show('siniestros')">Siniestros</button>
+<button onclick="show('impuestos')">Impuestos</button>
+<button onclick="show('normas')">Normativa</button>
+<button onclick="logout()">Salir</button>
+</nav>
+<main>
+
+<section id="inicio" class="active">
+<div class="card">
+<h2>Bienvenido, asesor</h2>
+<p>Administra los expedientes y las operaciones de demostración.</p>
+</div>
+<div class="card">
+<h3>Indicadores</h3>
+<p>Clientes registrados: <b id="total">0</b></p>
+<p>Contratos creados: <b id="totalContratos">0</b></p>
+<p>Documentos asociados: <b id="totalDocs">0</b></p>
+</div>
+</section>
+
+<section id="clientes">
+<div class="card">
+<h2>Registro de clientes</h2>
+<input id="nombre" placeholder="Nombre ficticio">
+<select id="tipo">
+<option>Adulto</option>
+<option>Menor de edad</option>
+</select>
+<input id="edad" type="number" placeholder="Edad">
+<input id="representante" placeholder="Representante legal (si es menor)">
+<button onclick="addClient()">Guardar cliente</button>
+<h3>Expedientes</h3>
+<table><thead><tr><th>Nombre</th><th>Tipo</th><th>Edad</th></tr></thead>
+<tbody id="clientList"></tbody></table>
+</div>
+</section>
+
+<section id="productos">
+<div class="card">
+<h2>Tipos de pólizas</h2>
+<ul>
+<li>Seguro de vida individual</li>
+<li>Seguro de vida familiar</li>
+<li>Protección educativa</li>
+<li>Enfermedades graves</li>
+<li>Accidentes personales</li>
+</ul>
+<h3>Cotizador educativo</h3>
+<input id="capital" type="number" placeholder="Capital asegurado en pesos">
+<select id="frecuencia">
+<option>Mensual</option><option>Anual</option>
+</select>
+<button onclick="quote()">Calcular</button>
+<p id="resultado"></p>
+<small>Tarifas hipotéticas para ejercicios académicos, no ofertas comerciales.</small>
+</div>
+</section>
+
+<section id="contratos">
+<div class="card">
+<h2>Contratos</h2>
+<input id="contrato" placeholder="Nombre del cliente">
+<select id="estado">
+<option>Pendiente de firma</option>
+<option>En revisión</option>
+<option>Firmado (simulación)</option>
+</select>
+<button onclick="addContract()">Crear registro</button>
+<table><thead><tr><th>Cliente</th><th>Estado</th></tr></thead>
+<tbody id="contractList"></tbody></table>
+</div>
+</section>
+
+<section id="documentos">
+<div class="card">
+<h2>Documentación</h2>
+<p>Adjuntar archivos ficticios al ejercicio.</p>
+<input id="archivo" type="file" accept=".pdf,.jpg,.jpeg,.png">
+<button onclick="addFile()">Asociar archivo</button>
+<ul id="fileList"></ul>
+</div>
+</section>
+
+<section id="siniestros">
+<div class="card">
+<h2>Simulador de reclamaciones</h2>
+<input id="indemnizacion" type="number" placeholder="Capital asegurado">
+<input id="porcentaje" type="number" placeholder="Porcentaje reconocido" value="100">
+<button onclick="claim()">Calcular indemnización</button>
+<h3 id="claimResult"></h3>
+<small>El resultado no representa reconocimiento de cobertura ni obligación de pago.</small>
+</div>
+</section>
+
+<section id="impuestos">
+<div class="card">
+<h2>Simulador tributario</h2>
+<p>Ejercicio de referencia sobre indemnizaciones de seguros de vida en Colombia.</p>
+<input id="valor" type="number" placeholder="Valor de indemnización COP">
+<button onclick="tax()">Calcular referencia</button>
+<p id="taxResult"></p>
+<small>Resultado académico. No constituye liquidación tributaria.</small>
+</div>
+</section>
+
+<section id="normas">
+<div class="card">
+<h2>Biblioteca normativa colombiana</h2>
+<ul>
+<li>Ley 1581 de 2012 – Protección de datos personales.</li>
+<li>Decreto 1074 de 2015 – Reglamentación de datos.</li>
+<li>Ley 1098 de 2006 – Infancia y adolescencia.</li>
+<li>Código de Comercio – Contrato de seguro.</li>
+<li>Ley 1328 de 2009 – Consumidor financiero.</li>
+<li>Ley 527 de 1999 – Comercio electrónico y mensajes de datos.</li>
+</ul>
+</div>
+</section>
+<footer><small>Confianza y Tranquilidad · Plataforma educativa · No emite seguros reales.</small></footer>
+</main>
+</div>
+
+<script>
+let clients=[],contracts=[],files=[];
+function login(){
+if(user.value==='asesor.demo'&&pass.value==='CTdemo2026!'){
+step1.hidden=true;step2.hidden=false;
+}else error.textContent='Credenciales incorrectas';
+}
+function verify(){
+if(code.value==='482916'){
+document.getElementById('login').style.display='none';
+document.getElementById('app').style.display='block';
+}else error2.textContent='Código incorrecto';
+}
+function logout(){location.reload()}
+function show(id){
+document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+}
+function addClient(){
+let n=nombre.value.trim(),e=Number(edad.value),t=tipo.value,r=representante.value.trim();
+if(!n||!Number.isFinite(e)||e<0||e>110){alert('Completa nombre y edad');return}
+if(t==='Menor de edad'&&(e>=18||!r)){alert('Registra un representante legal ficticio');return}
+if(t==='Adulto'&&e<18){alert('La edad debe ser de 18 años o más');return}
+clients.push({n,e,t});
+clientList.innerHTML=clients.map(c=>`<tr><td>${safe(c.n)}</td><td>${c.t}</td><td>${c.e}</td></tr>`).join('');
+total.textContent=clients.length;
+}
+function safe(s){let d=document.createElement('span');d.textContent=s;return d.innerHTML}
+function addContract(){
+if(!contrato.value.trim()){alert('Escribe un cliente');return}
+contracts.push({n:contrato.value,s:estado.value});
+contractList.innerHTML=contracts.map(c=>`<tr><td>${safe(c.n)}</td><td>${c.s}</td></tr>`).join('');
+totalContratos.textContent=contracts.length;
+}
+function addFile(){
+let f=archivo.files[0];
+if(!f){alert('Selecciona un archivo');return}
+if(f.size>8*1024*1024){alert('Máximo 8 MB');return}
+files.push(f.name);
+fileList.innerHTML=files.map(s=>'<li>'+safe(s)+'</li>').join('');
+totalDocs.textContent=files.length;
+}
+function quote(){
+let c=Number(capital.value);
+if(c<=0){alert('Ingresa un capital válido');return}
+let p=c*0.0005;
+resultado.textContent='Prima mensual hipotética: '+p.toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0});
+}
+function claim(){
+let c=Number(indemnizacion.value),p=Number(porcentaje.value);
+if(c<0||p<0||p>100){alert('Revisa los valores');return}
+claimResult.textContent='Resultado simulado: '+(c*p/100).toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0});
+}
+function tax(){
+let v=Number(valor.value),ex=Math.max(0,v-3250*52374);
+taxResult.textContent='Exceso sobre referencia de 3.250 UVT: '+ex.toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0})+'. No equivale al impuesto a pagar.';
+}
+</script>
+</body>
+</html>
